@@ -5,8 +5,8 @@ font.init()  # підключаємо шрифти
 mixer.init()  # підключаємо музику
 run = True
 TILE_SIZE = 40
-MAP_WIDTH = 20
-MAP_HEIGHT = 15
+MAP_WIDTH = 38
+MAP_HEIGHT = 19
 WIDTH, HEIGHT = MAP_WIDTH * TILE_SIZE, MAP_HEIGHT * TILE_SIZE   
 FPS = 60
 window = display.set_mode((WIDTH, HEIGHT))
