@@ -20,6 +20,7 @@ monster_image = image.load("images/sphinx_new.png")
 ground_image = transform.scale(image.load("images/map/tomb_3_old.png"), (TILE_SIZE, TILE_SIZE))
 wall_image = image.load("images/map/stone_brick_9.png")
 poison_image = image.load("images/map/brilliant_blue_new.png")
+coins_image = image.load("images\map\gold_pile_10.png")
 
 sprites = sprite.Group()
 
@@ -50,6 +51,7 @@ class Player(Sprite):
         
     def update(self): # створюємо функцію яка дозволяє рухатись кораблю
         global hp_label
+        global coins_label
         keyes = key.get_pressed() # створюємо змінну з натисканням кнопки
         old_position = self.rect.x , self.rect.y
         if keyes[K_UP] and self.rect.y > 0:
@@ -65,6 +67,7 @@ class Player(Sprite):
             self.rect.x , self.rect.y = old_position
 
         check_collide = sprite.spritecollide(self,enemy_group,False,sprite.collide_mask)
+        coins_collide = sprite.spritecollide(self,coins_group,True,sprite.collide_mask)
         if check_collide  and not self.hit:
             self.hit = True
             self.hp -= 50
@@ -73,7 +76,13 @@ class Player(Sprite):
         
         if len(check_collide) == 0:
             self.hit = False
+        
+        if coins_collide:
+            self.coins += 50 
+            coins_label = font1.render(f"Coins:{self.coins}",True,(0,0,0))        
 
+
+        
         
 
 enemy_group = sprite.Group()
@@ -113,6 +122,15 @@ wall_group = sprite.Group()
 player = Player(player_image,50,50,TILE_SIZE,TILE_SIZE,5)
 hp_label = font1.render(f"Hp:{player.hp}",True,(0,0,0))
 
+
+coins_group = sprite.Group() # група спрайтів
+coins_collide = sprite.spritecollide(player,coins_group,True,sprite.collide_mask)
+coins_label = font1.render(f"Coins:0",True,(0,0,0)) 
+
+if coins_collide:
+    coins_label = font1.render(f"Coins:{player.coins}",True,(0,0,0))  
+
+
 with open("map.txt","r") as file:
     x,y = TILE_SIZE/2,TILE_SIZE/2
     map = file.readlines()
@@ -129,7 +147,8 @@ with open("map.txt","r") as file:
                 Sprite(poison_image, x, y,TILE_SIZE - 10,TILE_SIZE - 10)
             if symbol == "e":
                 enemy_group.add(Enemy(monster_image, x, y,TILE_SIZE - 10,TILE_SIZE - 10))
-
+            if symbol == "c":
+                coins_group.add(Sprite(coins_image,x,y,TILE_SIZE - 10,TILE_SIZE - 10))
 
             
             x += TILE_SIZE
@@ -151,6 +170,7 @@ while run:
     sprites.draw(window)
     player.draw(window)
     window.blit(hp_label, (5,5))
+    window.blit(coins_label,(WIDTH - 150,5))
     sprites.update()
     display.update()
     clock.tick(FPS)
